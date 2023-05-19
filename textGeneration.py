@@ -19,7 +19,7 @@ with gr.Blocks() as demo:
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=input, outputs=output)
     gr.Markdown("## Examples")
-    gr.Examples(examples=["My name is jean and i like", "I go every day at the "],
+    gr.Examples(examples=["My name is James and i like", "I go every day at the "],
                 cache_examples=True,
                 inputs=input,
                 outputs=output,
