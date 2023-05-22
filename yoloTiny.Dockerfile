@@ -1,7 +1,7 @@
 FROM python:3.8
 
 WORKDIR /workspace
-ADD requirements_yoloTiny.txt yoloTiny.py /workspace/
+ADD requirements_yoloTiny.txt yoloTiny.py example.jpg /workspace/
 
 RUN pip install --no-cache-dir -r requirements_yoloTiny.txt
 
