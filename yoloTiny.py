@@ -1,5 +1,4 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, pipeline
-import torch
 import gradio as gr
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
@@ -10,10 +9,9 @@ image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 
 
 def predict(x):
-    obj_detector=pipeline("object-detection",model=model,feature_extractor=image_processor)
-    return(str(obj_detector(x)))
-
-
+    obj_detector = pipeline("object-detection", model=model,
+                            feature_extractor=image_processor)
+    return (str(obj_detector(x)))
 
 
 with gr.Blocks() as demo:
