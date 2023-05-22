@@ -1,8 +1,6 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection
-from PIL import Image
 import torch
 import gradio as gr
-import requests
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
@@ -14,9 +12,6 @@ image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 def predict(x):
     inputs = image_processor(images=x, return_tensors="pt")
     outputs = model(**inputs)
-    # model predicts bounding boxes and corresponding COCO classes
-    logits = outputs.logits
-    bboxes = outputs.pred_boxes
 
     # print results
     target_sizes = torch.tensor([x.size[::-1]])
@@ -36,8 +31,6 @@ with gr.Blocks() as demo:
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=image, outputs=output)
     gr.Markdown("## Examples")
-    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
-    example=Image.open(requests.get(url, stream=True).raw)
     gr.Examples(examples=["example.jpg"],
                 cache_examples=True,
                 inputs=image,
