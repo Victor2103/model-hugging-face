@@ -2,6 +2,7 @@ from transformers import YolosImageProcessor, YolosForObjectDetection
 from PIL import Image
 import torch
 import gradio as gr
+import requests
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
@@ -35,7 +36,9 @@ with gr.Blocks() as demo:
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=image, outputs=output)
     gr.Markdown("## Examples")
-    gr.Examples(examples=[Image.open("example.jpg").raw],
+    url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+    example=Image.open(requests.get(url, stream=True).raw)
+    gr.Examples(examples=["example.jpg"],
                 cache_examples=True,
                 inputs=image,
                 outputs=output,
