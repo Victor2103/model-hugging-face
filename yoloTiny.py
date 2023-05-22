@@ -1,6 +1,8 @@
-from transformers import YolosImageProcessor, YolosForObjectDetection
+from transformers import YolosImageProcessor, YolosForObjectDetection, pipeline
 import torch
 import gradio as gr
+import requests
+from PIL import Image
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
@@ -8,6 +10,10 @@ import gradio as gr
 model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
 image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 
+
+def test(x):
+    obj_detector=pipeline("object-detection",model=model,tokenizer=image_processor)
+    return(obj_detector(x))
 
 def predict(x):
     inputs = image_processor(images=x, return_tensors="pt")
@@ -23,7 +29,7 @@ def predict(x):
         returning += f"Detected {model.config.id2label[label.item()]} with confidence {round(score.item(), 3)} at location {box} \n"
     return (returning)
 
-
+"""
 with gr.Blocks() as demo:
     gr.Markdown("# Detect object from a given image ! ")
     image = gr.Image(label="Input Image", type="pil")
@@ -39,3 +45,9 @@ with gr.Blocks() as demo:
 
 
 demo.launch(server_name="0.0.0.0")
+"""
+
+
+url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+image = Image.open(requests.get(url, stream=True).raw)
+print(test(image))
