@@ -12,8 +12,6 @@ image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 
 
 def predict(im):
-    obj_detector = pipeline("object-detection", model=model,
-                            feature_extractor=image_processor)
     with torch.no_grad():
         inputs = image_processor(images=im, return_tensors="pt")
         outputs = model(**inputs)
