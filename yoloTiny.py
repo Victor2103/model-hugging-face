@@ -1,11 +1,11 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, pipeline
 import gradio as gr
-#import requests
+# import requests
 from PIL import ImageDraw
 import torch
 
-#url = "http://images.cocodataset.org/val2017/000000039769.jpg"
-#image = Image.open(requests.get(url, stream=True).raw)
+# url = "http://images.cocodataset.org/val2017/000000039769.jpg"
+# image = Image.open(requests.get(url, stream=True).raw)
 
 model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
 image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
@@ -21,15 +21,15 @@ def predict(im):
         results = image_processor.post_process_object_detection(
             outputs, threshold=0.5, target_sizes=target_sizes)[0]
     draw = ImageDraw.Draw(im)
-    text=""
+    text = ""
     for score, label, box in zip(results["scores"], results["labels"], results["boxes"]):
         box = [round(i, 2) for i in box.tolist()]
         x, y, x2, y2 = tuple(box)
         draw.rectangle((x, y, x2, y2), outline="red", width=1)
         draw.text((x, y), model.config.id2label[label.item()], fill="white")
-        text+=f"Detected {model.config.id2label[label.item()]} with confidence "
-        text+=f"{round(score.item(), 3)} at location {box} \n"
-    return ([text,im])
+        text += f"Detected {model.config.id2label[label.item()]} with confidence "
+        text += f"{round(score.item(), 3)} at location {box} \n"
+    return ([text, im])
 
 
 with gr.Blocks() as demo:
@@ -38,7 +38,8 @@ with gr.Blocks() as demo:
     output_text = gr.Textbox(label="Output Text")
     output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=image, outputs=[output_text,output_image])
+    generate_btn.click(fn=predict, inputs=image, outputs=[
+                       output_text, output_image])
     gr.Markdown("## Examples")
     gr.Examples(examples=["example.jpg"],
                 cache_examples=True,
