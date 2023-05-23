@@ -32,16 +32,19 @@ def predict(im):
     return ([text, im])
 
 
-with gr.Blocks() as demo:
+title = "Object Detection"
+
+with gr.Blocks(title="Object-detection") as demo:
     gr.Markdown("# Detect object from a given image ! ")
-    image = gr.Image(label="Input Image", type="pil")
-    output_text = gr.Textbox(label="Output Text")
-    output_image = gr.Image(label="Output Image", type="pil")
+    with gr.Row():
+        image = gr.Image(label="Input Image", type="pil")
+        output_text = gr.Textbox(label="Output Text")
+        output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=image, outputs=[
                        output_text, output_image])
     gr.Markdown("## Examples")
-    gr.Examples(examples=["example.jpg"],
+    gr.Examples(examples=["examples/example_1.jpg", "examples/example_2.jpg", "examples/example_3.jpg", "examples/example_4.jpg"],
                 cache_examples=True,
                 inputs=image,
                 outputs=[output_text, output_image],
