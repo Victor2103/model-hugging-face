@@ -14,13 +14,15 @@ image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
 def predict(x):
     obj_detector = pipeline("object-detection", model=model,
                             feature_extractor=image_processor)
-    return (str(obj_detector(x)),x)
+    return (str(obj_detector(x)), x)
+
 
 with torch.no_grad():
     inputs = image_processor(images=image, return_tensors="pt")
     outputs = model(**inputs)
     target_sizes = torch.tensor([image.size[::-1]])
-    results = image_processor.post_process_object_detection(outputs, threshold=0.5, target_sizes=target_sizes)[0]
+    results = image_processor.post_process_object_detection(
+        outputs, threshold=0.5, target_sizes=target_sizes)[0]
 
 
 draw = ImageDraw.Draw(image)
@@ -31,7 +33,7 @@ for score, label, box in zip(results["scores"], results["labels"], results["boxe
     draw.rectangle((x, y, x2, y2), outline="red", width=1)
     draw.text((x, y), model.config.id2label[label.item()], fill="white")
 
-#image.save("test.png")
+# image.save("test.png")
 
 
 with gr.Blocks() as demo:
@@ -40,12 +42,13 @@ with gr.Blocks() as demo:
     output_text = gr.Textbox(label="Output Text")
     output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=image, outputs=[output_text,output_image])
+    generate_btn.click(fn=predict, inputs=image, outputs=[
+                       output_text, output_image])
     gr.Markdown("## Examples")
     gr.Examples(examples=["example.jpg"],
                 cache_examples=True,
                 inputs=image,
-                outputs=[output_text,output_image],
+                outputs=[output_text, output_image],
                 fn=predict)
 
 
