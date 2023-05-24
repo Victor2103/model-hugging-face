@@ -1,9 +1,10 @@
-from transformers import GPT2Tokenizer, TFGPT2LMHeadModel, pipeline
-tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = TFGPT2LMHeadModel.from_pretrained('gpt2')
+import requests
 
-text = "Replace me by any text you'd like."
+headers={'Accept': 'application/json',
+         'Authorization': f'Bearer SAnNu2i6R+K6JOYaAUDclnTWx1XH3Ck7+hIfr2dWj4oLEbt+XvhMnvUUegm0QFY9'}
 
-pipe=pipeline("text-generation",model=model,tokenizer=tokenizer)
-generated_text=pipe(text_inputs=text,max_length=50)
-print(generated_text[0]["generated_text"])
+body={"fn_index":0,"data":["can you"],"event_data":None,"session_hash":"q75l89if3v8"}
+
+res=requests.post("https://f29f35cd-dce1-4a16-8cbc-c1f548cc7a46.app.gra.ai.cloud.ovh.net/run/predict",json=body,headers=headers)
+
+print(res.text)
