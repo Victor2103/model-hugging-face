@@ -1,12 +1,14 @@
 from fastapi import FastAPI
 
+app = FastAPI()
+
 from transformers import GPT2Tokenizer, TFGPT2LMHeadModel, pipeline
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
 model = TFGPT2LMHeadModel.from_pretrained('gpt2')
 
 pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
 
-app = FastAPI()
+
 
 
 @app.get("/")
