@@ -1,13 +1,19 @@
-import json
-import requests
-headers = {"Authorization": f"Bearer "}
-API_URL = "https://api-inference.huggingface.co/models/hustvl/yolos-tiny"
-def query(filename):
-    with open(filename, "rb") as f:
-        data = f.read()
-    response = requests.request("POST", API_URL, headers=headers, data=data)
-    print(response)
-    return json.loads(response.content.decode("utf-8"))
-data = query("examples/example_1.jpg")
+from fastapi import FastAPI
 
-print(data)
+from transformers import GPT2Tokenizer, TFGPT2LMHeadModel, pipeline
+tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
+model = TFGPT2LMHeadModel.from_pretrained('gpt2')
+
+pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
+
+app = FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+@app.get("/gpt2/{input_text}")
+async def read_item(input_text: str):
+    output = pipe(text_inputs=input_text, max_length=50)
+    return {"input_text": output[0]['generated_text']}
