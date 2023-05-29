@@ -12,4 +12,4 @@ ENV HOME=/workspace/
 # You expose the fast api app at port 8000
 EXPOSE 8000
 
-CMD uvicorn test:app
+CMD uvicorn --host 0.0.0.0 --port 8000 test:app
