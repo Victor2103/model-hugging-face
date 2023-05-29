@@ -1,5 +1,6 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
 import gradio as gr
+from fastapi import FastAPI
 # import requests
 from PIL import ImageDraw
 import torch
@@ -7,6 +8,12 @@ import torch
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
 
+
+app = FastAPI()
+
+@app.get("/")
+def read_main():
+    return {"message": "This is your main app"}
 
 models = ['hustvl/yolos-small', 'hustvl/yolos-tiny', 'facebook/detr-resnet-50']
 
@@ -59,4 +66,6 @@ with gr.Blocks(title="Object-detection") as demo:
                 outputs=[output_text, output_image],
                 fn=predict)
 
-demo.launch(server_name="0.0.0.0")
+gradio_app=gr.routes.App.create_app(demo)
+
+app.mount("/interface",gradio_app)
