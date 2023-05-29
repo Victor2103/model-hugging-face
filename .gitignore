@@ -6,3 +6,4 @@ __pycache__
 *.h5
 .vscode
 log.csv
+gradio_cached_examples
