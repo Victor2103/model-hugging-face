@@ -1,3 +1,4 @@
 transformers==4.28.1
 gradio==3.28.3
 torch==2.0.1
+timm==0.9.2
