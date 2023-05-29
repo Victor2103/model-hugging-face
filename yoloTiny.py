@@ -1,4 +1,4 @@
-from transformers import YolosImageProcessor, YolosForObjectDetection,DetrImageProcessor, DetrForObjectDetection, pipeline
+from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
 import gradio as gr
 # import requests
 from PIL import ImageDraw
@@ -8,11 +8,10 @@ import torch
 # image = Image.open(requests.get(url, stream=True).raw)
 
 
-models=['hustvl/yolos-small','hustvl/yolos-tiny','facebook/detr-resnet-50']
+models = ['hustvl/yolos-small', 'hustvl/yolos-tiny', 'facebook/detr-resnet-50']
 
 
-
-def predict(im,option_model):
+def predict(im, option_model):
     if option_model == 'facebook/detr-resnet-50':
         image_processor = DetrImageProcessor.from_pretrained(option_model)
         model = DetrForObjectDetection.from_pretrained(option_model)
@@ -42,13 +41,14 @@ title = "Object Detection"
 with gr.Blocks(title="Object-detection") as demo:
     gr.Markdown("# Detect object from a given image ! ")
     with gr.Column():
-        options = gr.Dropdown(choices=models,label='Select Object Detection Model',show_label=True)
+        options = gr.Dropdown(
+            choices=models, label='Select Object Detection Model', show_label=True)
     with gr.Row():
         image = gr.Image(label="Input Image", type="pil")
         output_text = gr.Textbox(label="Output Text")
         output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=[image,options], outputs=[
+    generate_btn.click(fn=predict, inputs=[image, options], outputs=[
                        output_text, output_image])
     gr.Markdown("## Examples")
     gr.Examples(examples=["examples/example_1.jpg", "examples/example_2.jpg", "examples/example_3.jpg", "examples/example_4.jpg"],
