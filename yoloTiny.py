@@ -51,9 +51,11 @@ with gr.Blocks(title="Object-detection") as demo:
     generate_btn.click(fn=predict, inputs=[image, options], outputs=[
                        output_text, output_image])
     gr.Markdown("## Examples")
-    gr.Examples(examples=[["examples/example_1.jpg",'hustvl/yolos-tiny'],["examples/example_2.jpg",'hustvl/yolos-tiny']],
+    gr.Examples(examples=[["examples/example_1.jpg", 'hustvl/yolos-tiny'],
+                          ["examples/example_2.jpg", 'hustvl/yolos-small'],
+                          ["examples/example_3.jpg", 'facebook/detr-resnet-50']],
                 cache_examples=True,
-                inputs=[image,options],
+                inputs=[image, options],
                 outputs=[output_text, output_image],
                 fn=predict)
 
