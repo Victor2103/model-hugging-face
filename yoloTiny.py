@@ -7,8 +7,8 @@ import torch
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
 
-model = YolosForObjectDetection.from_pretrained('hustvl/yolos-tiny')
-image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-tiny")
+model = YolosForObjectDetection.from_pretrained('hustvl/yolos-small')
+image_processor = YolosImageProcessor.from_pretrained("hustvl/yolos-small")
 
 
 def predict(im):
