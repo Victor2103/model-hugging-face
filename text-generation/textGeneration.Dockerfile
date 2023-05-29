@@ -9,7 +9,7 @@ RUN chown -R 42420:42420 /workspace/
 ENV HOME=/workspace/
 
 
-# You expose the gradio app at port 7860
-EXPOSE 7860
+# You expose the fast API app at port 8000
+EXPOSE 8000
 
-CMD python3 textGeneration.py
+CMD uvicorn textGeneration:app --host=0.0.0.0
