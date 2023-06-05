@@ -1,7 +1,8 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
 import gradio as gr
-from fastapi import FastAPI
-# import requests
+from fastapi import FastAPI, File, UploadFile
+from typing_extensions import Annotated
+import requests
 from PIL import ImageDraw
 import torch
 
@@ -43,7 +44,16 @@ def predict(im, option_model):
     return ([text, im])
 
 
-title = "Object Detection"
+@app.post("/files/")
+async def create_file(file: Annotated[bytes, File()]):
+    return {"file_size": len(file)}
+
+
+@app.post("/uploadfile/")
+async def create_upload_file(file: UploadFile):
+    return {"filename": file.filename}
+
+
 
 with gr.Blocks(title="Object-detection") as demo:
     gr.Markdown("# Detect object from a given image ! ")
@@ -66,6 +76,5 @@ with gr.Blocks(title="Object-detection") as demo:
                 outputs=[output_text, output_image],
                 fn=predict)
 
-gradio_app=gr.routes.App.create_app(demo)
+app = gr.mount_gradio_app(app, demo, path='/')
 
-app.mount("/interface",gradio_app)
