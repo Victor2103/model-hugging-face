@@ -7,3 +7,4 @@ __pycache__
 .vscode
 log.csv
 gradio_cached_examples
+fast_api_examples
