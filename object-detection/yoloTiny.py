@@ -1,20 +1,18 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
 import gradio as gr
 from fastapi import FastAPI, File, UploadFile
+from fastapi.responses import FileResponse
 from typing_extensions import Annotated
 import requests
-from PIL import ImageDraw
+from PIL import ImageDraw, Image
 import torch
+import io
+import uuid
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
 
-
 app = FastAPI()
-
-@app.get("/")
-def read_main():
-    return {"message": "This is your main app"}
 
 models = ['hustvl/yolos-small', 'hustvl/yolos-tiny', 'facebook/detr-resnet-50']
 
@@ -44,14 +42,37 @@ def predict(im, option_model):
     return ([text, im])
 
 
-@app.post("/files/")
-async def create_file(file: Annotated[bytes, File()]):
-    return {"file_size": len(file)}
 
-
-@app.post("/uploadfile/")
+@app.post("/yolos-small")
 async def create_upload_file(file: UploadFile):
-    return {"filename": file.filename}
+    trans=file.file.read()
+    trans=Image.open(io.BytesIO(trans))
+    print(type(trans))
+    text,image=predict(trans,'hustvl/yolos-small')
+    uuidOne = uuid.uuid1()
+    image.save(f"fast_api_examples/small/{uuidOne}.png")
+    return FileResponse(f"fast_api_examples/small/{uuidOne}.png") 
+
+@app.post("/yolos-tiny")
+async def create_upload_file(file: UploadFile):
+    trans=file.file.read()
+    trans=Image.open(io.BytesIO(trans))
+    print(type(trans))
+    text,image=predict(trans,'hustvl/yolos-tiny')
+    uuidOne = uuid.uuid1()
+    image.save(f"fast_api_examples/tiny/{uuidOne}.png")
+    return FileResponse(f"fast_api_examples/tiny/{uuidOne}.png") 
+
+@app.post("/detr-resnet-50")
+async def create_upload_file(file: UploadFile):
+    trans=file.file.read()
+    trans=Image.open(io.BytesIO(trans))
+    print(type(trans))
+    text,image=predict(trans,'facebook/detr-resnet-50')
+    uuidOne = uuid.uuid1()
+    image.save(f"fast_api_examples/resnet/{uuidOne}.png")
+    return FileResponse(f"fast_api_examples/resnet/{uuidOne}.png") 
+
 
 
 
@@ -76,5 +97,5 @@ with gr.Blocks(title="Object-detection") as demo:
                 outputs=[output_text, output_image],
                 fn=predict)
 
-app = gr.mount_gradio_app(app, demo, path='/')
+app = gr.mount_gradio_app(app, demo, path='/interface')
 
