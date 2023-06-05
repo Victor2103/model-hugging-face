@@ -24,7 +24,6 @@ def predict(x, max_length):
 def generate_text(data: request_body, max_length: int = 50):
     # Get the input text
     input_text = data.message
-    output = pipe(text_inputs=input_text, max_length=max_length)
     return {"input_text": predict(input_text, max_length)}
 
 
