@@ -13,4 +13,4 @@ ENV HOME=/workspace/
 # You expose the gradio app at port 7860
 EXPOSE 7860
 
-CMD python3 yoloTiny.py
+CMD uvicorn yoloTiny:app --host 0.0.0.0
