@@ -1,13 +1,12 @@
 from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
 import gradio as gr
 from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from typing_extensions import Annotated
 import requests
 from PIL import ImageDraw, Image
 import torch
 import io
-import uuid
 
 # url = "http://images.cocodataset.org/val2017/000000039769.jpg"
 # image = Image.open(requests.get(url, stream=True).raw)
@@ -47,31 +46,35 @@ def predict(im, option_model):
 async def create_upload_file(file: UploadFile):
     trans=file.file.read()
     trans=Image.open(io.BytesIO(trans))
-    print(type(trans))
-    text,image=predict(trans,'hustvl/yolos-small')
-    uuidOne = uuid.uuid1()
-    image.save(f"fast_api_examples/small/{uuidOne}.png")
-    return FileResponse(f"fast_api_examples/small/{uuidOne}.png") 
+    image=predict(trans,'hustvl/yolos-small')[1]
+    buf = io.BytesIO()
+    image.save(buf,format='png')
+    byte_im=buf.getvalue()
+    return  Response(content=byte_im, media_type="image/png")
+
+
 
 @app.post("/yolos-tiny")
 async def create_upload_file(file: UploadFile):
     trans=file.file.read()
     trans=Image.open(io.BytesIO(trans))
     print(type(trans))
-    text,image=predict(trans,'hustvl/yolos-tiny')
-    uuidOne = uuid.uuid1()
-    image.save(f"fast_api_examples/tiny/{uuidOne}.png")
-    return FileResponse(f"fast_api_examples/tiny/{uuidOne}.png") 
+    image=predict(trans,'hustvl/yolos-tiny')[1]
+    buf = io.BytesIO()
+    image.save(buf,format='png')
+    byte_im=buf.getvalue()
+    return  Response(content=byte_im, media_type="image/png") 
 
 @app.post("/detr-resnet-50")
 async def create_upload_file(file: UploadFile):
     trans=file.file.read()
     trans=Image.open(io.BytesIO(trans))
     print(type(trans))
-    text,image=predict(trans,'facebook/detr-resnet-50')
-    uuidOne = uuid.uuid1()
-    image.save(f"fast_api_examples/resnet/{uuidOne}.png")
-    return FileResponse(f"fast_api_examples/resnet/{uuidOne}.png") 
+    image=predict(trans,'facebook/detr-resnet-50')[1]
+    buf = io.BytesIO()
+    image.save(buf,format='png')
+    byte_im=buf.getvalue()
+    return  Response(content=byte_im, media_type="image/png")
 
 
 
