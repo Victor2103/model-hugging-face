@@ -10,7 +10,8 @@ pipeline = transformers.pipeline(
     model=model,
     tokenizer=tokenizer,
     torch_dtype=torch.bfloat16,
-    trust_remote_code=True
+    trust_remote_code=True,
+    device_map="auto"
 )
 sequences = pipeline(
    "I'm trying to have since 1999 all of the nba champions. Can you tell me since 1999 the team who won the championship with the 5 players on the basketball field ?",
