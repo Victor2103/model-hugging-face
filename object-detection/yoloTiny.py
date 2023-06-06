@@ -1,9 +1,7 @@
-from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection, pipeline
+from transformers import YolosImageProcessor, YolosForObjectDetection, DetrImageProcessor, DetrForObjectDetection
 import gradio as gr
-from fastapi import FastAPI, File, UploadFile
-from fastapi.responses import FileResponse, Response
-from typing_extensions import Annotated
-import requests
+from fastapi import FastAPI, UploadFile
+from fastapi.responses import Response
 from PIL import ImageDraw, Image
 import torch
 import io
@@ -41,42 +39,39 @@ def predict(im, option_model):
     return ([text, im])
 
 
-
 @app.post("/yolos-small")
 async def create_upload_file(file: UploadFile):
-    trans=file.file.read()
-    trans=Image.open(io.BytesIO(trans))
-    image=predict(trans,'hustvl/yolos-small')[1]
+    trans = file.file.read()
+    trans = Image.open(io.BytesIO(trans))
+    image = predict(trans, 'hustvl/yolos-small')[1]
     buf = io.BytesIO()
-    image.save(buf,format='png')
-    byte_im=buf.getvalue()
-    return  Response(content=byte_im, media_type="image/png")
-
+    image.save(buf, format='png')
+    byte_im = buf.getvalue()
+    return Response(content=byte_im, media_type="image/png")
 
 
 @app.post("/yolos-tiny")
 async def create_upload_file(file: UploadFile):
-    trans=file.file.read()
-    trans=Image.open(io.BytesIO(trans))
+    trans = file.file.read()
+    trans = Image.open(io.BytesIO(trans))
     print(type(trans))
-    image=predict(trans,'hustvl/yolos-tiny')[1]
+    image = predict(trans, 'hustvl/yolos-tiny')[1]
     buf = io.BytesIO()
-    image.save(buf,format='png')
-    byte_im=buf.getvalue()
-    return  Response(content=byte_im, media_type="image/png") 
+    image.save(buf, format='png')
+    byte_im = buf.getvalue()
+    return Response(content=byte_im, media_type="image/png")
+
 
 @app.post("/detr-resnet-50")
 async def create_upload_file(file: UploadFile):
-    trans=file.file.read()
-    trans=Image.open(io.BytesIO(trans))
+    trans = file.file.read()
+    trans = Image.open(io.BytesIO(trans))
     print(type(trans))
-    image=predict(trans,'facebook/detr-resnet-50')[1]
+    image = predict(trans, 'facebook/detr-resnet-50')[1]
     buf = io.BytesIO()
-    image.save(buf,format='png')
-    byte_im=buf.getvalue()
-    return  Response(content=byte_im, media_type="image/png")
-
-
+    image.save(buf, format='png')
+    byte_im = buf.getvalue()
+    return Response(content=byte_im, media_type="image/png")
 
 
 with gr.Blocks(title="Object-detection") as demo:
@@ -101,4 +96,3 @@ with gr.Blocks(title="Object-detection") as demo:
                 fn=predict)
 
 app = gr.mount_gradio_app(app, demo, path='/interface')
-
