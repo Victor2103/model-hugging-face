@@ -95,4 +95,4 @@ with gr.Blocks(title="Object-detection") as demo:
                 outputs=[output_text, output_image],
                 fn=predict)
 
-app = gr.mount_gradio_app(app, demo, path='/interface')
+app = gr.mount_gradio_app(app, demo, path='/')
