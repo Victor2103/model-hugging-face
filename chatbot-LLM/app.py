@@ -1,16 +1,8 @@
-"""from transformers import AutoTokenizer, AutoModelForCausalLM
-
-tokenizer = AutoTokenizer.from_pretrained("cyl/awsome-llama")
-
-model = AutoModelForCausalLM.from_pretrained("cyl/awsome-llama")
-
-pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
-"""
 from transformers import AutoTokenizer, AutoModelForCausalLM
 import transformers
 import torch
 
-model = "tiiuae/falcon-40b-instruct"
+model = "tiiuae/falcon-7b-instruct"
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline = transformers.pipeline(
@@ -18,12 +10,11 @@ pipeline = transformers.pipeline(
     model=model,
     tokenizer=tokenizer,
     torch_dtype=torch.bfloat16,
-    trust_remote_code=True,
-    device_map="auto",
+    trust_remote_code=True
 )
 sequences = pipeline(
-   "Girafatron is obsessed with giraffes, the most glorious animal on the face of this Earth. Giraftron believes all other animals are irrelevant when compared to the glorious majesty of the giraffe.\nDaniel: Hello, Girafatron!\nGirafatron:",
-    max_length=200,
+   "I'm trying to have since 1999 all of the nba champions. Can you tell me since 1999 the team who won the championship with the 5 players on the basketball field ?",
+    max_length=1000,
     do_sample=True,
     top_k=10,
     num_return_sequences=1,
@@ -31,3 +22,4 @@ sequences = pipeline(
 )
 for seq in sequences:
     print(f"Result: {seq['generated_text']}")
+
