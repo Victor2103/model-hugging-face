@@ -2,37 +2,55 @@ import torch
 from diffusers import StableDiffusionPipeline
 import gradio as gr
 from fastapi import FastAPI
+import io
+from fastapi.responses import Response
+from pydantic import BaseModel
 
 app = FastAPI()
 
 model_id = "CompVis/stable-diffusion-v1-4"
-#device = "cuda"
+# device = "cuda"
 
 
-def predict(message:str):
-    pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+class request_body(BaseModel):
+    message: str
+
+
+def predict(message: str):
+    pipe = StableDiffusionPipeline.from_pretrained(
+        model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
     image = pipe(message).images[0]
-    return(image)
+    return (image)
+
+
+@app.post("/stable-diffusion")
+async def create_upload_file(data: request_body):
+    input_text = data.message
+    image = predict(input_text)
+    buf = io.BytesIO()
+    image.save(buf, format='png')
+    byte_im = buf.getvalue()
+    return Response(content=byte_im, media_type="image/png")
 
 
 with gr.Blocks(title="Image Generation !") as demo:
     gr.Markdown("Generate an image with a prompt !")
-    #with gr.Column():
+    # with gr.Column():
     #    options = gr.Dropdown(
     #        choices=models, label='Select Object Detection Model', show_label=True)
     with gr.Row():
         text_input = gr.Textbox(label="Input Text")
         output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=[text_input], outputs= output_image)
+    generate_btn.click(fn=predict, inputs=[text_input], outputs=output_image)
     gr.Markdown("## Examples")
-    """gr.Examples(examples=[["examples/example_1.jpg", 'hustvl/yolos-tiny'],
-                          ["examples/example_2.jpg", 'hustvl/yolos-small'],
-                          ["examples/example_3.jpg", 'facebook/detr-resnet-50']],
+    gr.Examples(examples=[['A man in the space'],
+                          ["A man buying a sandwich at the bakery"],
+                          ["A cat fighting with a dog"]],
                 cache_examples=True,
-                inputs=[image, options],
-                outputs=[output_text, output_image],
-                fn=predict)"""
+                inputs=[text_input],
+                outputs=[output_image],
+                fn=predict)
 
 app = gr.mount_gradio_app(app, demo, path='/')
