@@ -4,7 +4,8 @@ WORKDIR /workspace
 ADD requirements.txt /workspace/
 #ADD examples /workspace/examples/
 
-RUN pip install -r requirements.txt
+RUN pip install --upgrade pip
+RUN pip install --no-cache-dir -r requirements.txt
 
 ADD app.py /workspace/
 
