@@ -19,7 +19,7 @@ def predict(prompt):
         torch_dtype=torch.bfloat16,
         trust_remote_code=True,
         framework="pt",
-        device_map="auto"
+        device=torch.device('cuda:0')
     )
     sequences = pipeline(
         prompt,
