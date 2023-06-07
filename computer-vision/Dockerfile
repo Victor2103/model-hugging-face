@@ -1,10 +1,13 @@
 FROM python:3.8
 
 WORKDIR /workspace
-ADD requirements_dalle.txt dalle.py /workspace/
+ADD requirements_dalle.txt /workspace/
 #ADD examples /workspace/examples/
 
-RUN pip install --no-cache-dir -r requirements_dalle.txt
+RUN pip install -r requirements_dalle.txt
+#RUN pip install --no-cache-dir -r requirements_dalle.txt
+
+ADD dalle.py /workspace/
 
 RUN chown -R 42420:42420 /workspace/
 ENV HOME=/workspace/
