@@ -14,7 +14,7 @@ pipeline = transformers.pipeline(
     device_map="auto"
 )
 sequences = pipeline(
-   "I'm trying to have since 1999 all of the nba champions. Can you tell me since 1999 the team who won the championship with the 5 players on the basketball field ?",
+   "Oui Oui is a cartoon caracter. He has a taxi and can honk when he wants. He has a taxi race. Imagine the discussion with this caracter in the taxi. He is very special and don't like to discuss.",
     max_length=1000,
     do_sample=True,
     top_k=10,
@@ -23,4 +23,6 @@ sequences = pipeline(
 )
 for seq in sequences:
     print(f"Result: {seq['generated_text']}")
+    
+
 
