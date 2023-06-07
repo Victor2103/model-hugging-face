@@ -6,12 +6,12 @@ from fastapi import FastAPI
 app = FastAPI()
 
 model_id = "CompVis/stable-diffusion-v1-4"
-device = "cuda"
+#device = "cuda"
 
 
-def predict(message,model):
-    pipe = StableDiffusionPipeline.from_pretrained(model, torch_dtype=torch.float16)
-    pipe = pipe.to(device) 
+def predict(message:str):
+    pipe = StableDiffusionPipeline.from_pretrained(model_id, torch_dtype=torch.float16)
+    pipe = pipe.to("cuda")
     image = pipe(message).images[0]
     return(image)
 
@@ -22,10 +22,10 @@ with gr.Blocks(title="Image Generation !") as demo:
     #    options = gr.Dropdown(
     #        choices=models, label='Select Object Detection Model', show_label=True)
     with gr.Row():
-        prompt = gr.Textbox(label="Prompt")
+        text_input = gr.Textbox(label="Input Text")
         output_image = gr.Image(label="Output Image", type="pil")
     generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=[prompt, model_id], outputs= output_image)
+    generate_btn.click(fn=predict, inputs=[text_input], outputs= output_image)
     gr.Markdown("## Examples")
     """gr.Examples(examples=[["examples/example_1.jpg", 'hustvl/yolos-tiny'],
                           ["examples/example_2.jpg", 'hustvl/yolos-small'],
