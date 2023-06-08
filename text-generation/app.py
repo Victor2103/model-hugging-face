@@ -1,14 +1,18 @@
-from transformers import GPT2Tokenizer, TFGPT2LMHeadModel, pipeline
+from transformers import GPT2Tokenizer, GPT2LMHeadModel, pipeline
 import gradio as gr
+import torch
 from fastapi import FastAPI
 from pydantic import BaseModel
 
 app = FastAPI()
 
 tokenizer = GPT2Tokenizer.from_pretrained('gpt2')
-model = TFGPT2LMHeadModel.from_pretrained('gpt2')
+model = GPT2LMHeadModel.from_pretrained('gpt2')
 
-pipe = pipeline("text-generation", model=model, tokenizer=tokenizer)
+device = "cuda:0" if torch.cuda.is_available() else "cpu"
+
+pipe = pipeline("text-generation", model=model,
+                tokenizer=tokenizer, device=device, framework='pt')
 
 
 class request_body(BaseModel):
