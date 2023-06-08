@@ -3,24 +3,29 @@ import transformers
 import torch
 import gradio as gr
 from fastapi import FastAPI
-
+from pydantic import BaseModel
 
 app = FastAPI()
 
 model = "tiiuae/falcon-7b-instruct"
 
+tokenizer = AutoTokenizer.from_pretrained(model)
+pipeline = transformers.pipeline(
+    "text-generation",
+    model=model,
+    tokenizer=tokenizer,
+    torch_dtype=torch.bfloat16,
+    trust_remote_code=True,
+    framework="pt",
+    device=torch.device('cuda:0')
+)
+
+
+class request_body(BaseModel):
+    message: str
+
 
 def predict(prompt):
-    tokenizer = AutoTokenizer.from_pretrained(model)
-    pipeline = transformers.pipeline(
-        "text-generation",
-        model=model,
-        tokenizer=tokenizer,
-        torch_dtype=torch.bfloat16,
-        trust_remote_code=True,
-        framework="pt",
-        device=torch.device('cuda:0')
-    )
     sequences = pipeline(
         prompt,
         max_length=1000,
@@ -35,6 +40,12 @@ def predict(prompt):
     return (result)
 
 
+@app.post('/falcon')
+def generate_text(data: request_body):
+    input_text = data.message
+    return ({"output_text": f"{predict(input_text)}"})
+
+
 with gr.Blocks(title="Chat GPT") as demo:
     gr.Markdown("# Speak with a chatbot here !")
     text_input = gr.Textbox(label="Input Text")
@@ -43,8 +54,8 @@ with gr.Blocks(title="Chat GPT") as demo:
     generate_btn.click(fn=predict, inputs=[
                        text_input], outputs=output)
     gr.Markdown("## Examples")
-    gr.Examples(examples=[["Imagine the journey of a simple man living in London who go to work. He doesn't have a car and childrens."],
-                          ["I want to write a story to a little child of 10 years. Help me do this"]],
+    gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals."],
+                          ["Can you implement a function in python who calculate the square value of a number ?"]],
                 cache_examples=True,
                 inputs=[text_input],
                 outputs=output,

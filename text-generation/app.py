@@ -28,7 +28,7 @@ def predict(x, max_length):
 def generate_text(data: request_body, max_length: int = 50):
     # Get the input text
     input_text = data.message
-    return {"input_text": predict(input_text, max_length)}
+    return {"output_text": predict(input_text, max_length)}
 
 
 with gr.Blocks(title="Text Generation") as demo:
