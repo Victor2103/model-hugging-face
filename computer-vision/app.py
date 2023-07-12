@@ -14,6 +14,7 @@ models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"]
 
 class request_body(BaseModel):
     message: str
+    model_id: str = models
 
 
 def predict(message: str, model_id: str):
@@ -27,7 +28,8 @@ def predict(message: str, model_id: str):
 @app.post("/stable-diffusion")
 async def create_upload_file(data: request_body):
     input_text = data.message
-    image = predict(input_text)
+    model_id=data.model_id
+    image = predict(input_text,model_id=model_id)
     buf = io.BytesIO()
     image.save(buf, format='png')
     byte_im = buf.getvalue()
