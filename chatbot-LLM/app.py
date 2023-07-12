@@ -8,9 +8,10 @@ from pydantic import BaseModel
 app = FastAPI()
 
 model = "tiiuae/falcon-7b-instruct"
+rick_model = ''
 
 tokenizer = AutoTokenizer.from_pretrained(model)
-pipeline = transformers.pipeline(
+pipeline_falcon = transformers.pipeline(
     "text-generation",
     model=model,
     tokenizer=tokenizer,
@@ -20,13 +21,21 @@ pipeline = transformers.pipeline(
     device=torch.device('cuda:0')
 )
 
+rick_tokenizer = AutoTokenizer.from_pretrained(rick_model)
+pipeline_ricky = transformers.pipeline(
+    "text-generation",
+    model=rick_model,
+    tokenizer=tokenizer,
+    framework='pt'
+)
+
 
 class request_body(BaseModel):
     message: str
 
 
 def predict(prompt):
-    sequences = pipeline(
+    sequences = pipeline_ricky(
         prompt,
         max_length=1000,
         do_sample=True,
