@@ -48,11 +48,17 @@ def generate_text(data: request_body):
 
 with gr.Blocks(title="Chat GPT") as demo:
     gr.Markdown("# Speak with a chatbot here !")
-    text_input = gr.Textbox(label="Input Text")
-    output = gr.Textbox(label="Output Text")
-    generate_btn = gr.Button("Generate")
-    generate_btn.click(fn=predict, inputs=[
-                       text_input], outputs=output)
+    chatbot = gr.Chatbot()
+    msg = gr.Textbox()
+    clear = gr.ClearButton([msg, chatbot])
+
+    def respond(message, chat_history):
+        bot_message = predict(msg)
+        chat_history.append((message, bot_message))
+        return "", chat_history
+
+    msg.submit(respond, [msg, chatbot], [msg, chatbot])
+    """
     gr.Markdown("## Examples")
     gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals."],
                           ["Can you implement a function in python who calculate the square value of a number ?"]],
@@ -60,5 +66,6 @@ with gr.Blocks(title="Chat GPT") as demo:
                 inputs=[text_input],
                 outputs=output,
                 fn=predict)
+    """
 
 app = gr.mount_gradio_app(app, demo, path='/')
