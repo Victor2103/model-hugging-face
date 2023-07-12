@@ -31,20 +31,21 @@ class request_body(BaseModel):
 
 def predict_ricky(input, history=[]):
     # tokenize the new input sentence
-    new_user_input_ids = tokenizer.encode(input + tokenizer.eos_token, return_tensors='pt')
+    new_user_input_ids = rick_tokenizer.encode(input + rick_tokenizer.eos_token, return_tensors='pt')
 
     # append the new user input tokens to the chat history
     bot_input_ids = torch.cat([torch.LongTensor(history), new_user_input_ids], dim=-1)
 
     # generate a response 
-    history = model.generate(bot_input_ids, max_length=4000, pad_token_id=tokenizer.eos_token_id).tolist()
+    history = rick_model.generate(bot_input_ids, max_length=4000, pad_token_id=rick_tokenizer.eos_token_id).tolist()
 
     # convert the tokens to text, and then split the responses into lines
-    response = tokenizer.decode(history[0]).split("<|endoftext|>")
+    response = rick_tokenizer.decode(history[0]).split("<|endoftext|>")
     #print('decoded_response-->>'+str(response))
     response = [(response[i], response[i+1]) for i in range(0, len(response)-1, 2)]  # convert to tuples of list
-    #print('response-->>'+str(response))
-    return response
+    print('response-->>'+str(response))
+    
+    return response[0][1]
 
 
 def predict(prompt):
@@ -68,26 +69,31 @@ def generate_text(data: request_body):
     return ({"output_text": f"{predict(input_text)}"})
 
 
+models=['falcon','rick and morty']
+
 with gr.Blocks(title="Chat GPT") as demo:
     gr.Markdown("# Speak with a chatbot here !")
     chatbot = gr.Chatbot()
+    options = gr.Dropdown(
+            choices=models, label='Select Chatbot Model', show_label=True)
     msg = gr.Textbox()
     clear = gr.ClearButton([msg, chatbot])
 
-    def respond(message, chat_history):
-        bot_message = predict_ricky(input=message,history=[chat_history])
-        chat_history.append((message, bot_message))
+    def respond(message, chat_history,options):
+        if options == 'rick and morty':
+            bot_message = predict_ricky(input=message,history=[])
+        else:
+            bot_message = predict(prompt=message)
+        chat_history.append((message,bot_message))
         return "", chat_history
 
-    msg.submit(respond, [msg, chatbot], [msg, chatbot])
-    """
+    msg.submit(respond, [msg, chatbot,options], [msg, chatbot])
     gr.Markdown("## Examples")
-    gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals."],
-                          ["Can you implement a function in python who calculate the square value of a number ?"]],
+    gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals.",[("","")],'rick and morty'],
+                          ["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals.",[("","")],'rick and morty']],        
                 cache_examples=True,
-                inputs=[text_input],
-                outputs=output,
-                fn=predict)
-    """
+                inputs=[msg,chatbot,options],
+                outputs=[msg,chatbot],
+                fn=respond)
 
 app = gr.mount_gradio_app(app, demo, path='/')
