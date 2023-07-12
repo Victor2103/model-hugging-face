@@ -53,7 +53,7 @@ with gr.Blocks(title="Chat GPT") as demo:
     clear = gr.ClearButton([msg, chatbot])
 
     def respond(message, chat_history):
-        bot_message = predict(msg)
+        bot_message = predict(message)
         chat_history.append((message, bot_message))
         return "", chat_history
 
