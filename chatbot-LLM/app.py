@@ -1,4 +1,4 @@
-from transformers import AutoTokenizer
+from transformers import AutoTokenizer, AutoModelForCausalLM
 import transformers
 import torch
 import gradio as gr
@@ -8,7 +8,7 @@ from pydantic import BaseModel
 app = FastAPI()
 
 model = "tiiuae/falcon-7b-instruct"
-rick_model = ''
+rick_model = AutoModelForCausalLM.from_pretrained("ericzhou/DialoGPT-Medium-Rick_v2")
 
 tokenizer = AutoTokenizer.from_pretrained(model)
 pipeline_falcon = transformers.pipeline(
@@ -21,21 +21,34 @@ pipeline_falcon = transformers.pipeline(
     device=torch.device('cuda:0')
 )
 
-rick_tokenizer = AutoTokenizer.from_pretrained(rick_model)
-pipeline_ricky = transformers.pipeline(
-    "text-generation",
-    model=rick_model,
-    tokenizer=tokenizer,
-    framework='pt'
-)
+rick_tokenizer = AutoTokenizer.from_pretrained("ericzhou/DialoGPT-Medium-Rick_v2")
+
 
 
 class request_body(BaseModel):
     message: str
 
 
+def predict_ricky(input, history=[]):
+    # tokenize the new input sentence
+    new_user_input_ids = tokenizer.encode(input + tokenizer.eos_token, return_tensors='pt')
+
+    # append the new user input tokens to the chat history
+    bot_input_ids = torch.cat([torch.LongTensor(history), new_user_input_ids], dim=-1)
+
+    # generate a response 
+    history = model.generate(bot_input_ids, max_length=4000, pad_token_id=tokenizer.eos_token_id).tolist()
+
+    # convert the tokens to text, and then split the responses into lines
+    response = tokenizer.decode(history[0]).split("<|endoftext|>")
+    #print('decoded_response-->>'+str(response))
+    response = [(response[i], response[i+1]) for i in range(0, len(response)-1, 2)]  # convert to tuples of list
+    #print('response-->>'+str(response))
+    return response
+
+
 def predict(prompt):
-    sequences = pipeline_ricky(
+    sequences = pipeline_falcon(
         prompt,
         max_length=1000,
         do_sample=True,
@@ -62,7 +75,7 @@ with gr.Blocks(title="Chat GPT") as demo:
     clear = gr.ClearButton([msg, chatbot])
 
     def respond(message, chat_history):
-        bot_message = predict(message)
+        bot_message = predict_ricky(input=message,history=[chat_history])
         chat_history.append((message, bot_message))
         return "", chat_history
 
