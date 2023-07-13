@@ -68,6 +68,11 @@ def generate_text(data: request_body):
     input_text = data.message
     return ({"output_text": f"{predict(input_text)}"})
 
+@app.post('/rick-and-morty')
+def speak_with_rick(data: request_body):
+    input_text = data.message
+    return({'output_text': f'{predict_ricky(input=input_text,history=[])}'})
+
 
 models=['falcon','rick and morty']
 
@@ -89,8 +94,8 @@ with gr.Blocks(title="Chat GPT") as demo:
 
     msg.submit(respond, [msg, chatbot,options], [msg, chatbot])
     gr.Markdown("## Examples")
-    gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals.",[("","")],'rick and morty'],
-                          ["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals.",[("","")],'rick and morty']],        
+    gr.Examples(examples=[["Tell me from 1998 to 2002 all the NBA championship teams and their starting five in the finals.",[("","")],'falcon'],
+                          ["You can't kill my parents Rick",[("","")],'rick and morty']],        
                 cache_examples=True,
                 inputs=[msg,chatbot,options],
                 outputs=[msg,chatbot],
