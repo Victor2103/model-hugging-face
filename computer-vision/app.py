@@ -8,7 +8,8 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5","prompthero/openjourney","wavymulder/Analog-Diffusion"]
+models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5",
+          "prompthero/openjourney", "wavymulder/Analog-Diffusion"]
 # device = "cuda"
 
 
@@ -22,9 +23,9 @@ def predict(message: str, model_id: str):
         model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
     if model_id == "prompthero/openjourney":
-        message+=", mdjrny-v4 style"
+        message += ", mdjrny-v4 style"
     if model_id == "wavymulder/Analog-Diffusion":
-        message+=", analog style"
+        message += ", analog style"
     image = pipe(message).images[0]
     return (image)
 
@@ -32,8 +33,8 @@ def predict(message: str, model_id: str):
 @app.post("/stable-diffusion")
 async def create_upload_file(data: request_body):
     input_text = data.message
-    model_id=data.model_id
-    image = predict(input_text,model_id=model_id)
+    model_id = data.model_id
+    image = predict(input_text, model_id=model_id)
     buf = io.BytesIO()
     image.save(buf, format='png')
     byte_im = buf.getvalue()
@@ -46,15 +47,17 @@ with gr.Blocks(title="Image Generation !") as demo:
         options = gr.Dropdown(
             choices=models, label='Select Image Generation Model', show_label=True)
     with gr.Row():
-        text_input = gr.Textbox(label="Prompt something !",show_label=True)
-        output_image = gr.Image(label="Here is the image create with your prompt",show_label=True, type="pil")
+        text_input = gr.Textbox(label="Prompt something !", show_label=True)
+        output_image = gr.Image(
+            label="Here is the image create with your prompt", show_label=True, type="pil")
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=[
                        text_input, options], outputs=output_image)
     gr.Markdown("## Examples")
     gr.Examples(examples=[['A man in the space', "CompVis/stable-diffusion-v1-4"],
                           ['A woman singing in a bar', "prompthero/openjourney"],
-                          ['A man drinking a beer in a stadium', "wavymulder/Analog-Diffusion"],
+                          ['A man drinking a beer in a stadium',
+                              "wavymulder/Analog-Diffusion"],
                           ["A cat fighting with a dog", "runwayml/stable-diffusion-v1-5"]],
                 cache_examples=True,
                 show_label=False,
