@@ -8,7 +8,7 @@ from pydantic import BaseModel
 
 app = FastAPI()
 
-models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5"]
+models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5","prompthero/openjourney"]
 # device = "cuda"
 
 
@@ -21,6 +21,8 @@ def predict(message: str, model_id: str):
     pipe = StableDiffusionPipeline.from_pretrained(
         model_id, torch_dtype=torch.float16)
     pipe = pipe.to("cuda")
+    if model_id == "prompthero/openjourney":
+        message+=", mdjrny-v4 style"
     image = pipe(message).images[0]
     return (image)
 
@@ -49,6 +51,7 @@ with gr.Blocks(title="Image Generation !") as demo:
                        text_input, options], outputs=output_image)
     gr.Markdown("## Examples")
     gr.Examples(examples=[['A man in the space', "CompVis/stable-diffusion-v1-4"],
+                          ['A woman singing in a bar', "prompthero/openjourney"],
                           ["A cat fighting with a dog", "runwayml/stable-diffusion-v1-5"]],
                 cache_examples=True,
                 inputs=[text_input, options],
