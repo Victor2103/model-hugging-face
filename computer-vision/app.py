@@ -41,13 +41,13 @@ async def create_upload_file(data: request_body):
 
 
 with gr.Blocks(title="Image Generation !") as demo:
-    gr.Markdown("Generate an image with a prompt !")
+    gr.Markdown("# Welcome on your first stable diffusion application !")
     with gr.Column():
         options = gr.Dropdown(
             choices=models, label='Select Image Generation Model', show_label=True)
     with gr.Row():
-        text_input = gr.Textbox(label="Input Text")
-        output_image = gr.Image(label="Output Image", type="pil")
+        text_input = gr.Textbox(label="Prompt something !",show_label=True)
+        output_image = gr.Image(label="Here is the image create with your prompt",show_label=True, type="pil")
     generate_btn = gr.Button("Generate")
     generate_btn.click(fn=predict, inputs=[
                        text_input, options], outputs=output_image)
@@ -57,6 +57,7 @@ with gr.Blocks(title="Image Generation !") as demo:
                           ['A man drinking a beer in a stadium', "wavymulder/Analog-Diffusion"],
                           ["A cat fighting with a dog", "runwayml/stable-diffusion-v1-5"]],
                 cache_examples=True,
+                show_label=False,
                 inputs=[text_input, options],
                 outputs=[output_image],
                 fn=predict)
