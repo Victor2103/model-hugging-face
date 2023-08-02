@@ -12,7 +12,6 @@ models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5",
           "prompthero/openjourney", "wavymulder/Analog-Diffusion"]
 # device = "cuda"
 
-
 class request_body(BaseModel):
     message: str
     model_id: str = models
@@ -41,7 +40,7 @@ async def create_upload_file(data: request_body):
     return Response(content=byte_im, media_type="image/png")
 
 
-with gr.Blocks(title="Image Generation !") as demo:
+with gr.Blocks(title="Image Generation !",theme=gr.themes.Glass()) as demo:
     gr.Markdown("# Welcome on your first stable diffusion application !")
     with gr.Column():
         options = gr.Dropdown(
@@ -60,7 +59,6 @@ with gr.Blocks(title="Image Generation !") as demo:
                               "wavymulder/Analog-Diffusion"],
                           ["A cat fighting with a dog", "runwayml/stable-diffusion-v1-5"]],
                 cache_examples=True,
-                show_label=False,
                 inputs=[text_input, options],
                 outputs=[output_image],
                 fn=predict)
