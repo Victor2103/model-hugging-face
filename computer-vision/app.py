@@ -12,7 +12,7 @@ models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5",
           "prompthero/openjourney", "wavymulder/Analog-Diffusion"]
 # device = "cuda"
 
-description="""# <p style="text-align: center;"> Welcome on your first stable diffusion application ! </p>
+description = """# <p style="text-align: center;"> Welcome on your first stable diffusion application ! </p>
 
 We provide you 4 models from Hugging Face of stable diffusion. You can do inference with all this models. Each model has his own documentation and all of them use the stable diffusion library. 
 
@@ -29,6 +29,7 @@ Here are the 4 links to the documentation on Hugging Face :
 Here's how the application works. We give a description and the model returns an image corresponding to the description. 
 
 ![local img](file=text-to-image.png)"""
+
 
 class request_body(BaseModel):
     message: str
@@ -58,7 +59,7 @@ async def create_upload_file(data: request_body):
     return Response(content=byte_im, media_type="image/png")
 
 
-with gr.Blocks(title="Image Generation !",theme='nota-ai/theme') as demo:
+with gr.Blocks(title="Image Generation !", theme='nota-ai/theme') as demo:
     gr.Markdown(description)
     with gr.Column():
         options = gr.Dropdown(

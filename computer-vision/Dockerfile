@@ -10,6 +10,9 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Add the fast api app
 COPY app.py /workspace/
 
+# Add the image for the description 
+COPY text-to-image.png /workspace/
+
 # Run as 420 user
 RUN chown -R 42420:42420 /workspace/
 ENV HOME=/workspace/
