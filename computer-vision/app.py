@@ -12,6 +12,24 @@ models = ["CompVis/stable-diffusion-v1-4", "runwayml/stable-diffusion-v1-5",
           "prompthero/openjourney", "wavymulder/Analog-Diffusion"]
 # device = "cuda"
 
+description="""# <p style="text-align: center;"> Welcome on your first stable diffusion application ! </p>
+
+We provide you 4 models from Hugging Face of stable diffusion. You can do inference with all this models. Each model has his own documentation and all of them use the stable diffusion library. 
+
+Here are the 4 links to the documentation on Hugging Face :
+
+* Openjourney is an open source Stable Diffusion fine tuned model on Midjourney images. [Link](https://huggingface.co/prompthero/openjourney)
+
+* Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. [Link](https://huggingface.co/CompVis/stable-diffusion-v1-4)
+
+* Stable Diffusion is a latent text-to-image diffusion model capable of generating photo-realistic images given any text input. It is just the updated version of the model above. [Link](https://huggingface.co/runwayml/stable-diffusion-v1-5)
+
+* This is a dreambooth model trained on a diverse set of analog photographs. [Link](https://huggingface.co/wavymulder/Analog-Diffusion)
+
+Here's how the application works. We give a description and the model returns an image corresponding to the description. 
+
+![local img](file=text-to-image.png)"""
+
 class request_body(BaseModel):
     message: str
     model_id: str = models
@@ -40,8 +58,8 @@ async def create_upload_file(data: request_body):
     return Response(content=byte_im, media_type="image/png")
 
 
-with gr.Blocks(title="Image Generation !",theme=gr.themes.Glass()) as demo:
-    gr.Markdown("# Welcome on your first stable diffusion application !")
+with gr.Blocks(title="Image Generation !",theme='nota-ai/theme') as demo:
+    gr.Markdown(description)
     with gr.Column():
         options = gr.Dropdown(
             choices=models, label='Select Image Generation Model', show_label=True)
